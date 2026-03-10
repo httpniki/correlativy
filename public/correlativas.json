@@ -1,0 +1,74 @@
+{
+   "name": "Ingeniería en Sistemas de Información",
+   "plan": 2023,
+   "periods": [
+      {
+         "year": 1,
+         "modules": [
+            { "id": "1", "name": "Análisis Matemático I", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "2", "name": "Álgebra y Geometría Analítica", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "3", "name": "Física I", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "4", "name": "Inglés I", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "5", "name": "Lógica y Estructuras Discretas", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "6", "name": "Algoritmos y Estructuras de Datos", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "7", "name": "Arquitectura de Computadoras", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } },
+            { "id": "8", "name": "Sistemas y Procesos de Negocio", "status": "Pendiente", "year": 1, "requirements": { "passed": [], "taken": [] } }
+         ]
+      },
+      {
+         "year": 2,
+         "modules": [
+            { "id": "9", "name": "Análisis Matemático II", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["1", "2"] } },
+            { "id": "10", "name": "Física II", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["1", "3"] } },
+            { "id": "11", "name": "Ingeniería y Sociedad", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": [] } },
+            { "id": "12", "name": "Inglés II", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["4"] } },
+            { "id": "13", "name": "Sintaxis y Semántica de los Lenguajes", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["5", "6"] } },
+            { "id": "14", "name": "Paradigmas de Programación", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["5", "6"] } },
+            { "id": "15", "name": "Sistemas Operativos", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["7"] } },
+            { "id": "16", "name": "Análisis de Sistemas de Información", "status": "Pendiente", "year": 2, "requirements": { "passed": [], "taken": ["6", "8"] } }
+         ]
+      },
+      {
+         "year": 3,
+         "modules": [
+            { "id": "17", "name": "Probabilidad y Estadística", "status": "Pendiente", "year": 3, "requirements": { "passed": [], "taken": ["1", "2"] } },
+            { "id": "18", "name": "Economía", "status": "Pendiente", "year": 3, "requirements": { "passed": ["1", "2"], "taken": [] } },
+            { "id": "19", "name": "Bases de Datos", "status": "Pendiente", "year": 3, "requirements": { "passed": ["5", "6"], "taken": ["13", "16"] } },
+            { "id": "20", "name": "Desarrollo de Software", "status": "Pendiente", "year": 3, "requirements": { "passed": ["5", "6"], "taken": ["14", "16"] } },
+            { "id": "21", "name": "Comunicación de Datos", "status": "Pendiente", "year": 3, "requirements": { "passed": ["3", "7"], "taken": [] } },
+            { "id": "22", "name": "Análisis Numérico", "status": "Pendiente", "year": 3, "requirements": { "passed": ["1", "2"], "taken": ["9"] } },
+            { "id": "23", "name": "Diseño de Sistemas de Información", "status": "Pendiente", "year": 3, "requirements": { "passed": ["4", "6", "8"], "taken": ["14", "16"] } },
+            { "id": "I3", "name": "Inglés III (Optativa)", "status": "Pendiente", "year": 3, "requirements": { "passed": [], "taken": ["12"] } },
+            { "id": "E3", "name": "Electivas 3° nivel", "status": "Pendiente", "year": 3, "requirements": { "passed": [], "taken": [] } }
+         ]
+      },
+      {
+         "year": 4,
+         "modules": [
+            { "id": "24", "name": "Legislación", "status": "Pendiente", "year": 4, "requirements": { "passed": [], "taken": ["11"] } },
+            { "id": "25", "name": "Ingeniería y Calidad de Software", "status": "Pendiente", "year": 4, "requirements": { "passed": ["13", "14"], "taken": ["19", "20", "23"] } },
+            { "id": "26", "name": "Redes de Datos", "status": "Pendiente", "year": 4, "requirements": { "passed": [], "taken": ["15", "21"] } },
+            { "id": "27", "name": "Investigación Operativa", "status": "Pendiente", "year": 4, "requirements": { "passed": [], "taken": ["17", "22"] } },
+            { "id": "28", "name": "Simulación", "status": "Pendiente", "year": 4 , "requirements": { "passed": ["9"], "taken": ["17"] } },
+            { "id": "29", "name": "Tecnologías para la Automatización", "status": "Pendiente", "year": 4, "requirements": { "passed": ["9"], "taken": ["10", "22"] } },
+            { "id": "30", "name": "Administración de Sistemas de Información", "status": "Pendiente", "year": 4, "requirements": { "passed": ["16"], "taken": ["18", "23"] } },
+            { "id": "I4", "name": "Inglés IV (Optativa)", "status": "Pendiente", "year": 4, "requirements": { "passed": [], "taken": ["I3"] } },
+            { "id": "E4", "name": "Electivas 4° nivel", "status": "Pendiente", "year": 4, "requirements": { "passed": [], "taken": [] } }
+         ]
+      },
+      {
+         "year": 5,
+         "modules": [
+            { "id": "31", "name": "Inteligencia Artificial", "status": "Pendiente", "year": 5, "requirements": { "passed": ["17", "22"], "taken": ["28"] } },
+            { "id": "32", "name": "Ciencia de Datos", "status": "Pendiente", "year": 5, "requirements": { "passed": ["17", "19"], "taken": ["28"] } },
+            { "id": "33", "name": "Sistemas de Gestión", "status": "Pendiente", "year": 5, "requirements": { "passed": ["23"], "taken": ["18", "27"] } },
+            { "id": "34", "name": "Gestión Gerencial", "status": "Pendiente", "year": 5, "requirements": { "passed": ["18"], "taken": ["24", "30"] } },
+            { "id": "35", "name": "Seguridad en los Sistemas de Información", "status": "Pendiente", "year": 5, "requirements": { "passed": ["20", "21"], "taken": ["26", "30"] } },
+            { "id": "I5", "name": "Inglés V", "status": "Pendiente", "year": 5, "requirements": { "passed": [], "taken": ["I4"] } },
+            { "id": "E5", "name": "Electivas 5° nivel", "status": "Pendiente", "year": 5, "requirements": { "passed": [], "taken": [] } },
+            {"id": "PFI", "name": "Projecto Final (Integrador)", "status": "Pendiente", "year": 5, "requirements": { "passed": ["25", "26", "30"], "taken": ["12", "20", "23"] } },
+            {"id": "PPS", "name": "Práctica Profesional Supervisada", "status": "Pendiente", "year": 5, "requirements": { "passed": ["25", "26", "30"], "taken": ["12", "20", "23"] } }
+         ]
+      }
+   ]
+}
