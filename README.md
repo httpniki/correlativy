@@ -2,9 +2,11 @@
 
 Track my university progress through interactive nodes. Visualize course prerequisites and identify which courses I can take based on my completed subjects.
 
+![Screenshot](public/screenshot.png)
+
 ## Stack 🛠️ 
 
-* ReactJs
+* ReactJS
 * Vite
 * Typescript
 * TailwindCSS
