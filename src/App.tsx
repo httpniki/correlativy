@@ -211,7 +211,7 @@ function App() {
                }
             </Panel>
 
-            <Background className='opacity-20' />
+            <Background className='opacity-30' />
          </ReactFlow>
       </main>
    )

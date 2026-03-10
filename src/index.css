@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --color-main: #101013;
-  --color-node: #11111f;
+  /* --color-main: #101013; */
+   --color-main: #060015;
+  /* --color-node: #11111f; */
+  --color-node: #1e0039;
   --color-taken: #ac3e21;
   --color-passed: #008236;
   --color-shadow-white: #ffffff80;
