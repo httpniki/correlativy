@@ -3,14 +3,16 @@
 @theme {
   /* --color-main: #101013; */
    --color-main: #060015;
-  /* --color-node: #11111f; */
-  --color-node: #1e0039;
+  --color-node: #533c76;
+  --color-node-selected: #b08bec;
   --color-taken: #ac3e21;
-  --color-passed: #008236;
+  --color-taken-selected: #d76548;
+  --color-passed: #006e22;
+  --color-passed-selected: #439d50;
   --color-shadow-white: #ffffff80;
   --color-shadow-white-dim: #ffffff50;
-  --color-shadow-taken: #f0802090;
-  --color-shadow-passed: #00f00050;
+  --color-shadow-taken: #ac3e2190;
+  --color-shadow-passed: #006e2290;
 }
 
 @utility text-shadow-white {
@@ -22,11 +24,11 @@
 }
 
 @utility shadow-taken {
-  box-shadow: 0 0 8px var(--color-shadow-taken);
+  box-shadow: 0 0 10px var(--color-shadow-taken);
 }
 
 @utility shadow-passed {
-  box-shadow: 0 0 8px var(--color-shadow-passed);
+  box-shadow: 0 0 10px var(--color-shadow-passed);
 }
 
 :root {
