@@ -3,7 +3,7 @@ import type { Module, NodeData } from "../types/types"
 import changeModuleStatus from "../utils/changeModuleStatus"
 import checkEnrollment from "../utils/checkEnrollment"
 import useNodes from "../store/useNodes"
-import { useEffect, useState } from "react"
+import { useRef } from "react"
 
 type ModuleNodeData = {
    [key in keyof Module]: Module[key]
@@ -16,19 +16,9 @@ type ModuleNodeData = {
 export type IModuleNode = Node<ModuleNodeData, 'module'>
 
 export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
-   const [state, setState] = useState({
-      status: data.status,
-      canEnroll: data.canEnroll
-   })
-   const { updateNodeData, getNodeConnections } = useReactFlow()
+   const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+   const { updateNodeData, getNodeConnections, updateEdge, updateNode } = useReactFlow()
    const { moduleNodes } = useNodes((state) => state)
-
-   useEffect(() => {
-      setState({
-         status: data.status,
-         canEnroll: data.canEnroll
-      })
-   }, [data.status, data.canEnroll])
 
    function verifyTargetEnrollment(node_id: IModuleNode['id'], allNodes: IModuleNode[]) {
       let nodes = allNodes
@@ -50,7 +40,38 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
       })
    }
 
-   function handleClick() {
+   function propagateSelection(node_id: IModuleNode['id']) {
+      const connections = getNodeConnections({ nodeId: node_id })
+
+      moduleNodes.forEach(node => {
+         if (!connections.some(c => c.target === node.id) && !connections.some(c => c.source === node.id)) {
+            getNodeConnections({ nodeId: node.id }).forEach(connection => {
+               updateEdge(connection.edgeId, { hidden: true })
+            })
+
+            updateNode(node.id, { data: node.data, style: { opacity: 0.5 } })
+         }
+
+         if (connections.some(c => c.source === node.id)) {
+            const edge = connections.find(c => c.source === node.id)
+            if (!edge) throw new Error(`Edge not found for source node "${node.id}"`)
+
+            updateNode(node.id, { style: { opacity: 1 } })
+            updateEdge(edge.edgeId, { hidden: false, selected: false })
+         }
+
+         if (connections.some(c => c.target === node.id)) {
+            const edge = connections.find(c => c.target === node.id)
+
+            if (!edge) throw new Error(`Edge not found for target node "${node.id}"`)
+
+            updateEdge(edge.edgeId, { hidden: false, selected: false })
+            updateNode(node.id, { style: { opacity: 1 } })
+         }
+      })
+   }
+
+   function updateNodeStatus() {
       let nodes = moduleNodes
       const node = moduleNodes.find(n => n.id === id)
 
@@ -62,20 +83,44 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
          node.data.status = changeModuleStatus(node.data.status)
          node.data.canEnroll = true
          nodes = nodes.map(n => n.id === node.id ? node : n)
-         updateNodeData(node.id, { data: node.data })
+         updateNodeData(node.id, { ...node.data })
       }
 
       verifyTargetEnrollment(id, nodes)
    }
 
+   function handleClick() {
+      if (clickTimeoutRef.current) {
+         clearTimeout(clickTimeoutRef.current)
+         clickTimeoutRef.current = null
+      }
+
+      clickTimeoutRef.current = setTimeout(() => {
+         propagateSelection(id)
+         clickTimeoutRef.current = null
+      }, 300)
+   }
+
+   function handleDoubleClick() {
+      if (clickTimeoutRef.current) {
+         clearTimeout(clickTimeoutRef.current)
+         clickTimeoutRef.current = null
+      }
+
+      updateNodeStatus()
+   }
+
    return (
-      <button onClick={handleClick} className={
-         'cursor-pointer py-2 px-4 rounded-md text-white text-shadow-white-dim z-20' +
-         `${(state.status === 'Pendiente' && !state.canEnroll) ? ' bg-node' : ''}` +
-         `${(state.status === 'Pendiente' && state.canEnroll) ? ' bg-node border border-white' : ''}` +
-         `${state.status === 'Regular' ? ' bg-taken shadow-taken' : ''}` +
-         `${state.status === 'Aprobado' ? ' bg-passed shadow-passed' : ''}`
-      }>
+      <button
+         onClick={handleClick}
+         onDoubleClick={handleDoubleClick}
+         className={'cursor-pointer py-2 px-4 rounded-md text-white text-shadow-white-dim z-20' +
+            (data.status === 'Pendiente' && !data.canEnroll ? ' bg-node' : '') +
+            (data.status === 'Pendiente' && data.canEnroll ? ' bg-node outline-[1.9px] outline-white' : '') +
+            (data.status === 'Regular' ? ' bg-taken box-shadow-taken' : '') +
+            (data.status === 'Aprobado' ? ' bg-passed box-shadow-passed' : '')
+         }
+      >
          <Handle
             type='target'
             style={{ opacity: 0 }}
@@ -84,7 +129,7 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
          />
 
          <p className='text-base font-semibold'>{data.name}</p>
-         <p className='text-xs'>{state.status}</p>
+         <p className='text-xs'>{data.status}</p>
 
          <Handle
             type='source'

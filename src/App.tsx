@@ -1,19 +1,24 @@
 import '@xyflow/react/dist/style.css'
 
 import { useCallback, useEffect, useRef } from 'react'
-import { applyEdgeChanges, applyNodeChanges, Background, MarkerType, Panel, ReactFlow, useNodesInitialized, useReactFlow } from '@xyflow/react'
+import { applyEdgeChanges, applyNodeChanges, Background, Panel, ReactFlow, useNodesInitialized, useReactFlow } from '@xyflow/react'
 import useNodes from './store/useNodes'
-import type { Edge, NodeTypes, OnEdgesChange, OnNodesChange } from '@xyflow/react'
+import type { Edge as EdgeType, EdgeTypes, NodeTypes, OnEdgesChange, OnNodesChange } from '@xyflow/react'
 import type { Program } from './types/types'
 import ModuleNode, { type IModuleNode } from './components/ModuleNode'
 import PeriodNode, { type IPeriodNode } from './components/PeriodNode'
 import Header from './components/Header'
 import setLocalStorage from './utils/setLocalStorage'
 import getLocalStorage from './utils/getLocalStorage'
+import Edge from './components/Edge'
 
 const nodeTypes: NodeTypes = {
    module: ModuleNode,
    period: PeriodNode
+}
+
+const edgeTypes: EdgeTypes = {
+   edge: Edge
 }
 
 function App() {
@@ -27,7 +32,7 @@ function App() {
       setEdges,
       getAllNodes
    } = useNodes((state) => state)
-   const { fitView, updateNode } = useReactFlow<(IModuleNode | IPeriodNode)>()
+   const { fitView, updateNode, updateEdge } = useReactFlow<(IModuleNode | IPeriodNode)>()
    const isNodesInitialized = useNodesInitialized()
    const refPanel = useRef<HTMLDivElement>(null)
 
@@ -54,7 +59,7 @@ function App() {
          .then(async (res) => await res.json())
          .then((program: Program) => {
             const newNodes: (IModuleNode | IPeriodNode)[] = []
-            const newEdges: Edge[] = []
+            const newEdges: EdgeType[] = []
 
             program.periods.forEach((p) => {
                newNodes.push({
@@ -93,7 +98,7 @@ function App() {
                         id: `${module.id}-${parent}`,
                         source: `${parent}`,
                         target: `${module.id}`,
-                        markerEnd: { type: MarkerType.Arrow }
+                        type: 'edge'
                      })
                   })
                }
@@ -122,7 +127,7 @@ function App() {
       moduleNodes.forEach(node => {
          const periodNode = periodNodes.find(n => n.data.year === node.data.year)
 
-         if(!periodNode) throw new Error('PeriodNode not found')
+         if (!periodNode) throw new Error('PeriodNode not found')
          if (!periodNode?.measured?.height) throw new Error('PeriodNode height is not defined')
          if (!node.measured?.height) throw new Error('ModuleNode height is not defined')
 
@@ -151,7 +156,7 @@ function App() {
          period.modules.forEach((module) => {
             const node = moduleNodes.find(n => n.id === `${module.id}`)
 
-            if(!node) throw new Error('ModuleNode not found')
+            if (!node) throw new Error('ModuleNode not found')
             if (typeof node.measured?.width !== 'number') throw new Error('ModuleNode width is not defined')
 
             node.position.x = prevNodePosX + prevNodeWidth + NODE_SPACING
@@ -180,21 +185,28 @@ function App() {
       [moduleNodes, periodNodes, setNodes, getAllNodes]
    )
 
-   const onEdgesChange: OnEdgesChange<Edge> = useCallback(
+   const onEdgesChange: OnEdgesChange<EdgeType> = useCallback(
       (changes) => setEdges(applyEdgeChanges(changes, edges)),
       [edges, setEdges]
    )
 
+   function resetSelection() {
+      moduleNodes.forEach(node => updateNode(node.id, { style: { opacity: 1 } }))
+      edges.forEach(edge => updateEdge(edge.id, { hidden: false, selected: false }))
+   }
+
    return (
       <main className='bg-main w-screen h-screen relative'>
          <ReactFlow
-            nodes={getAllNodes()}
+            nodes={[...moduleNodes, ...periodNodes]}
             nodeTypes={nodeTypes}
+            edgeTypes={edgeTypes}
             onNodesChange={onNodesChange}
             zoomOnDoubleClick={false}
             edges={edges}
             onEdgesChange={onEdgesChange}
             fitView
+            onPaneClick={resetSelection}
          >
             <Panel position='top-center' className='w-full pointer-events-none' ref={refPanel}>
                {(program) &&
@@ -204,9 +216,13 @@ function App() {
                      onResetPositions={() => {
                         calculatePositionY()
                         calculatePositionX()
+                        resetSelection()
                         fitViewport()
                      }}
-                     onFitView={fitViewport}
+                     onFitView={() => {
+                        resetSelection()
+                        fitViewport()
+                     }}
                   />
                }
             </Panel>
