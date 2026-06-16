@@ -2,12 +2,12 @@
 
 @theme {
   /* --color-main: #101013; */
-   --color-main: #060015;
-  --color-node: #533c76;
+   --color-main: #0a0a0a;
+  --color-node: #161616;
   --color-node-selected: #b08bec;
-  --color-taken: #ac3e21;
+  --color-taken: #F97316;
   --color-taken-selected: #d76548;
-  --color-passed: #006e22;
+  --color-passed: #10B981;
   --color-passed-selected: #439d50;
   --color-shadow-white: #ffffff80;
   --color-shadow-white-dim: #ffffff50;
