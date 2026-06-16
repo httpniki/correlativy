@@ -1,13 +1,14 @@
 interface Props {
    programName: string
    programPlan: number
+   hidden: boolean
    onResetPositions: () => void
    onFitView: () => void
 }
 
-export default function Header({ programName, programPlan, onResetPositions, onFitView }: Props) {
+export default function Header({ programName, programPlan, hidden, onResetPositions, onFitView }: Props) {
    return (
-      <header className='w-full grid grid-cols-3 grid-rows-1'>
+      <header className={`w-full grid grid-cols-3 grid-rows-1 ${hidden ? 'invisible' : ''}`}>
          <div className='flex col-2 flex-2 flex-col justify-center items-center gap-1 text-white py-10'>
             <h1 className='text-2xl text-center bg-main px-1 text-white text-shadow-white'>{programName}</h1>
 

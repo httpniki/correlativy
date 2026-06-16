@@ -1,6 +1,6 @@
 import '@xyflow/react/dist/style.css'
 
-import { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { applyEdgeChanges, applyNodeChanges, Background, Panel, ReactFlow, useNodesInitialized, useReactFlow } from '@xyflow/react'
 import useNodes from './store/useNodes'
 import type { Edge as EdgeType, EdgeTypes, NodeTypes, OnEdgesChange, OnNodesChange } from '@xyflow/react'
@@ -34,6 +34,7 @@ function App() {
    } = useNodes((state) => state)
    const { fitView, updateNode, updateEdge } = useReactFlow<(IModuleNode | IPeriodNode)>()
    const isNodesInitialized = useNodesInitialized()
+   const [isDragging, setIsDragging] = useState(false)
    const refPanel = useRef<HTMLDivElement>(null)
 
    /**
@@ -207,23 +208,26 @@ function App() {
             onEdgesChange={onEdgesChange}
             fitView
             onPaneClick={resetSelection}
+            onMoveStart={() => setIsDragging(true)}
+            onMoveEnd={() => setIsDragging(false)}
          >
             <Panel position='top-center' className='w-full pointer-events-none' ref={refPanel}>
                {(program) &&
-                  <Header
-                     programName={program.name}
-                     programPlan={program.plan}
-                     onResetPositions={() => {
-                        calculatePositionY()
-                        calculatePositionX()
-                        resetSelection()
-                        fitViewport()
-                     }}
-                     onFitView={() => {
-                        resetSelection()
-                        fitViewport()
-                     }}
-                  />
+                   <Header
+                      programName={program.name}
+                      programPlan={program.plan}
+                      hidden={isDragging}
+                      onResetPositions={() => {
+                         calculatePositionY()
+                         calculatePositionX()
+                         resetSelection()
+                         fitViewport()
+                      }}
+                      onFitView={() => {
+                         resetSelection()
+                         fitViewport()
+                      }}
+                   />
                }
             </Panel>
 

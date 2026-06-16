@@ -114,9 +114,9 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
       <button
          onClick={handleClick}
          onDoubleClick={handleDoubleClick}
-         className={'cursor-pointer py-2 px-4 rounded-md text-white text-shadow-white-dim z-20' +
-            (data.status === 'Pendiente' && !data.canEnroll ? ' bg-node' : '') +
-            (data.status === 'Pendiente' && data.canEnroll ? ' bg-node outline-[1.9px] outline-white' : '') +
+         className={'cursor-pointer py-2 px-4 rounded-md z-20 text-white' +
+            (data.status === 'Pendiente' && !data.canEnroll ? ' bg-node text-white' : '') +
+            (data.status === 'Pendiente' && data.canEnroll ? ' bg-node outline-white' : '') +
             (data.status === 'Regular' ? ' bg-taken box-shadow-taken' : '') +
             (data.status === 'Aprobado' ? ' bg-passed box-shadow-passed' : '')
          }
