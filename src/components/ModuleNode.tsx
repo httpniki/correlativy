@@ -62,8 +62,8 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
          />
 
          <p className='text-base'>{data.id}</p>
-         <p className='text-base font-semibold'>{data.name}</p>
-         <p className='text-xs'>{data.status}</p>
+         <p className='text-lg font-semibold'>{data.name}</p>
+         <p className='text-base'>{data.status}</p>
 
          <Handle
             type='source'
