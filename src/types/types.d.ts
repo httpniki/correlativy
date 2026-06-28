@@ -1,6 +1,3 @@
-import type { IModuleNode } from "../components/ModuleNode"
-import type { IPeriodNode } from "../components/PeriodNode"
-
 export interface Module {
    id: string
    name: string;
@@ -26,10 +23,4 @@ export interface Program {
 export interface NodeData {
    year: number
    type: 'period' | 'module'
-}
-
-interface Store {
-   program: Program
-   nodes: (IModuleNode | IPeriodNode)[]
-   edges: Edge[]
 }

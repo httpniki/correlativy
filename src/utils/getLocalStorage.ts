@@ -1,6 +1,6 @@
-import type { Store } from "../types/types"
+import type { Program } from "../types/types"
 
-export default function getLocalStorage(): Store | null {
+export default function getLocalStorage(): Program | null {
    const storage = localStorage.getItem('store')
-   return storage ? JSON.parse(storage) as Store : null
+   return storage ? JSON.parse(storage) as Program : null
 }

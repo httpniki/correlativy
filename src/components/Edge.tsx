@@ -1,11 +1,8 @@
-import { BaseEdge, getBezierPath, type Edge as EdgeType, type EdgeProps, Position, useReactFlow } from "@xyflow/react"
-import useNodes from "../store/useNodes"
-import { useEffect } from "react"
+import { BaseEdge, getBezierPath, type Edge as EdgeType, type EdgeProps, Position, type Edge } from "@xyflow/react"
 
-export default function Edge(props: EdgeProps<EdgeType>) {
-   const { moduleNodes, edges } = useNodes((state) => state)
-   const { updateNode, updateEdge } = useReactFlow()
+export type IEdge = EdgeType<EdgeType>
 
+export default function Edge(props: EdgeProps<IEdge>) {
    const [edgePath] = getBezierPath({
       sourceX: props.sourceX,
       sourceY: props.sourceY,
@@ -14,26 +11,11 @@ export default function Edge(props: EdgeProps<EdgeType>) {
       targetY: props.targetY,
    })
 
-   useEffect(() => {
-      if (!props.selected) return
-
-      moduleNodes.forEach(node => {
-         if (node.id === props.source) return updateNode(node.id, { style: { opacity: 1 } })
-         if (node.id === props.target) return updateNode(node.id, { style: { opacity: 1 } })
-
-         updateNode(node.id, { style: { opacity: 0.5 } })
-      })
-
-      edges.forEach(edge => {
-         if (edge.id === props.id) return updateEdge(edge.id, { hidden: false })
-         updateEdge(edge.id, { hidden: true })
-      })
-   }, [props.selected])
-
    return (
       <BaseEdge
          id={props.id}
          path={edgePath}
+         style={{ stroke: '#555' }}
       />
    )
 } 

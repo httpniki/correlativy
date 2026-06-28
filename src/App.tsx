@@ -1,20 +1,27 @@
 import '@xyflow/react/dist/style.css'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { applyEdgeChanges, applyNodeChanges, Background, Panel, ReactFlow, useNodesInitialized, useReactFlow } from '@xyflow/react'
+import { Background, Panel, ReactFlow, useNodesInitialized } from '@xyflow/react'
 import useNodes from './store/useNodes'
-import type { Edge as EdgeType, EdgeTypes, NodeTypes, OnEdgesChange, OnNodesChange } from '@xyflow/react'
+import type { EdgeTypes, NodeTypes } from '@xyflow/react'
 import type { Program } from './types/types'
 import ModuleNode, { type IModuleNode } from './components/ModuleNode'
 import PeriodNode, { type IPeriodNode } from './components/PeriodNode'
-import Header from './components/Header'
-import setLocalStorage from './utils/setLocalStorage'
+import Edge, { type IEdge } from './components/Edge'
+import useNodeActions from './hooks/useNodeActions'
+import useLayout from './hooks/useLayout'
+import type { IMenu } from './components/ContextMenu'
+import ContextMenu from './components/ContextMenu'
+import Controls from './components/Controls'
+import InfoNode, { type IInfoNode } from './components/InfoNode'
 import getLocalStorage from './utils/getLocalStorage'
-import Edge from './components/Edge'
+import setLocalStorage from './utils/setLocalStorage'
+import AcademicProgram from './domain/AcademicProgram'
 
 const nodeTypes: NodeTypes = {
    module: ModuleNode,
-   period: PeriodNode
+   period: PeriodNode,
+   info: InfoNode
 }
 
 const edgeTypes: EdgeTypes = {
@@ -22,216 +29,178 @@ const edgeTypes: EdgeTypes = {
 }
 
 function App() {
-   const {
-      moduleNodes,
-      periodNodes,
-      edges,
-      program,
-      setProgram,
-      setNodes,
-      setEdges,
-      getAllNodes
-   } = useNodes((state) => state)
-   const { fitView, updateNode, updateEdge } = useReactFlow<(IModuleNode | IPeriodNode)>()
+   const store = useNodes()
+   const nodeAction = useNodeActions()
+
+   const refPanel = useRef<HTMLDivElement>(null)
+   const layout = useLayout(refPanel)
+
+   const onNodesChange = useNodes((state) => state.onNodesChange)
+   const onEdgesChange = useNodes((state) => state.onEdgesChange)
+
    const isNodesInitialized = useNodesInitialized()
    const [isDragging, setIsDragging] = useState(false)
-   const refPanel = useRef<HTMLDivElement>(null)
+   const [menu, setMenu] = useState<IMenu | null>(null)
 
    /**
    * Saves the state of the app in LocalStorage
    */
    useEffect(() => {
-      if (!isNodesInitialized || !program) return
-      const nodes = getAllNodes()
-      setLocalStorage({ program, nodes, edges })
-   }, [moduleNodes, periodNodes])
+      if (!isNodesInitialized || !store.program) return
+      setLocalStorage(AcademicProgram.toJSON(store.program))
+   }, [store.nodes])
 
+   /**
+   * Initializes the nodes and edges
+   */
    useEffect(() => {
-      const store = getLocalStorage()
+      function initialize(program: Program) {
+         const parsedProgram = AcademicProgram.fromJSON(program)
 
-      if (store) {
-         setNodes(store.nodes)
-         setEdges(store.edges)
-         setProgram(store.program)
+         const newNodes: (IModuleNode | IPeriodNode | IInfoNode)[] = []
+         const newEdges: IEdge[] = []
+
+         parsedProgram.periods.forEach((p) => {
+            newNodes.push({
+               id: `year-${p.year}`,
+               type: 'period',
+               position: { x: 0, y: 0 },
+               data: { year: p.year, type: 'period' },
+               selected: false,
+               connectable: false,
+               draggable: false
+            })
+
+            p.modules.forEach((mod) => {
+               const requirements = [...mod.requirements.passed, ...mod.requirements.taken]
+               const hasRequirements = requirements.length > 0
+
+               newNodes.push({
+                  id: `${mod.id}`,
+                  position: { x: 0, y: 0 },
+                  data: {
+                     status: mod.status,
+                     name: mod.name,
+                     id: mod.id,
+                     year: mod.year,
+                     type: 'module',
+                     requirements: mod.requirements,
+                     canEnroll: !hasRequirements,
+                     onNodeClick: () => { nodeAction.selectNode(mod.id); setMenu(null) },
+                     onNodeDoubleClick: () => { nodeAction.switchNodeStatus(mod.id); setMenu(null) }
+                  },
+                  type: 'module',
+                  selected: false,
+                  connectable: false
+               })
+
+               requirements.forEach(parent => {
+                  newEdges.push({
+                     id: `${mod.id}-${parent}`,
+                     source: `${parent}`,
+                     target: `${mod.id}`,
+                     type: 'edge'
+                  })
+               })
+
+            })
+         })
+
+         newNodes.push({
+            id: 'info',
+            position: { x: 0, y: 0 },
+            data: {
+               programName: program.name,
+               programPlan: program.plan
+            },
+            type: 'info',
+            selected: false,
+            connectable: false,
+            draggable: false
+         })
+
+         store.setProgram(parsedProgram)
+         store.setNodes(newNodes)
+         store.setEdges(newEdges)
+      }
+
+      const localStorage = getLocalStorage()
+
+      if (localStorage) {
+         initialize(localStorage)
          return
       }
 
       fetch('/correlativas.json')
          .then(async (res) => await res.json())
-         .then((program: Program) => {
-            const newNodes: (IModuleNode | IPeriodNode)[] = []
-            const newEdges: EdgeType[] = []
-
-            program.periods.forEach((p) => {
-               newNodes.push({
-                  id: `year-${p.year}`,
-                  type: 'period',
-                  position: { x: 0, y: 0 },
-                  data: { year: p.year, type: 'period' },
-                  selected: false,
-                  connectable: false,
-                  draggable: false
-               })
-
-               for (const module of p.modules) {
-                  const requirements = [...module.requirements.passed, ...module.requirements.taken]
-                  const hasRequirements = requirements.length > 0
-
-                  newNodes.push({
-                     id: `${module.id}`,
-                     position: { x: 0, y: 0 },
-                     data: {
-                        status: module.status,
-                        name: module.name,
-                        id: module.id,
-                        year: module.year,
-                        type: 'module',
-                        requirements: module.requirements,
-                        canEnroll: !hasRequirements
-                     },
-                     type: 'module',
-                     selected: false,
-                     connectable: false
-                  })
-
-                  requirements.forEach(parent => {
-                     newEdges.push({
-                        id: `${module.id}-${parent}`,
-                        source: `${parent}`,
-                        target: `${module.id}`,
-                        type: 'edge'
-                     })
-                  })
-               }
-            })
-
-            setProgram(program)
-            setNodes(newNodes)
-            setEdges(newEdges)
-         })
+         .then((program: Program) => initialize(program))
          .catch((err) => console.error('Error reading JSON file: ', err))
    }, [])
 
-   function fitViewport() {
-      const PANEL_HEIGHT = refPanel.current?.getBoundingClientRect().height ?? 0
-      fitView({ padding: { top: `${PANEL_HEIGHT}px`, left: '40px', right: '40px', bottom: '40px' } })
-   }
-
-   function calculatePositionY() {
-      const NODE_VERTICALLY_SPACING = 150
-
-      periodNodes.forEach((node, index) => {
-         node.position.y = 0 + (NODE_VERTICALLY_SPACING * index)
-         updateNode(node.id, { position: node.position })
-      })
-
-      moduleNodes.forEach(node => {
-         const periodNode = periodNodes.find(n => n.data.year === node.data.year)
-
-         if (!periodNode) throw new Error('PeriodNode not found')
-         if (!periodNode?.measured?.height) throw new Error('PeriodNode height is not defined')
-         if (!node.measured?.height) throw new Error('ModuleNode height is not defined')
-
-         const labelCenterY = periodNode.position.y + (periodNode.measured.height / 2)
-         const nodeCenterY = node.position.y + (node.measured.height / 2)
-
-         node.position.y = node.position.y - nodeCenterY + labelCenterY
-
-         updateNode(node.id, { position: node.position })
-      })
-   }
-
-   function calculatePositionX() {
-      const NODE_SPACING = 10
-      const EXTRA_LABEL_SPACING = 20
-
-      program?.periods.forEach((period) => {
-         const periodNode = periodNodes.find(n => n.data.year === period.year)
-
-         if (!periodNode) throw new Error('PeriodNode not found')
-         if (typeof periodNode?.measured?.width !== 'number') throw new Error('PeriodNode width is not defined')
-
-         let prevNodePosX = periodNode.position.x + EXTRA_LABEL_SPACING
-         let prevNodeWidth = periodNode.measured.width
-
-         period.modules.forEach((module) => {
-            const node = moduleNodes.find(n => n.id === `${module.id}`)
-
-            if (!node) throw new Error('ModuleNode not found')
-            if (typeof node.measured?.width !== 'number') throw new Error('ModuleNode width is not defined')
-
-            node.position.x = prevNodePosX + prevNodeWidth + NODE_SPACING
-            prevNodePosX = node.position.x
-            prevNodeWidth = node.measured.width
-
-            updateNode(node.id, { position: node.position })
-         })
-      })
-   }
-
    /**
    * Calculates the position of the nodes and edges.
-   * This effect runs only during the first render when the state doesn't exist in LocalStorage.
+   * This effect runs only during the first render.
    */
    useEffect(() => {
       if (!isNodesInitialized) return
-      if (!moduleNodes.every(n => n.position.x === 0)) return
-      calculatePositionX()
-      calculatePositionY()
-      fitViewport()
+      if (!store.nodes.every(n => n.position.x === 0)) return
+      nodeAction.fitNodes()
+      layout.fitViewport()
    }, [isNodesInitialized])
 
-   const onNodesChange: OnNodesChange<(IModuleNode | IPeriodNode)> = useCallback(
-      (changes) => setNodes(applyNodeChanges(changes, getAllNodes())),
-      [moduleNodes, periodNodes, setNodes, getAllNodes]
-   )
+   const onNodeContextMenu = useCallback(
+      (event: React.MouseEvent<Element, MouseEvent>, node: (IModuleNode | IPeriodNode | IInfoNode)) => {
+         event.preventDefault()
+         const pane = refPanel.current?.getBoundingClientRect()
+         if (!pane || node.type === 'period' || node.type === 'info') return
 
-   const onEdgesChange: OnEdgesChange<EdgeType> = useCallback(
-      (changes) => setEdges(applyEdgeChanges(changes, edges)),
-      [edges, setEdges]
+         setMenu({
+            id: node.id,
+            top: event.clientY,
+            left: event.clientX,
+            node_id: node.id
+         })
+      },
+      [setMenu],
    )
-
-   function resetSelection() {
-      moduleNodes.forEach(node => updateNode(node.id, { style: { opacity: 1 } }))
-      edges.forEach(edge => updateEdge(edge.id, { hidden: false, selected: false }))
-   }
 
    return (
       <main className='bg-main w-screen h-screen relative'>
          <ReactFlow
-            nodes={[...moduleNodes, ...periodNodes]}
+            nodes={[...store.nodes]}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             onNodesChange={onNodesChange}
             zoomOnDoubleClick={false}
-            edges={edges}
+            edges={store.edges}
             onEdgesChange={onEdgesChange}
             fitView
-            onPaneClick={resetSelection}
-            onMoveStart={() => setIsDragging(true)}
+            onPaneClick={() => { nodeAction.unselectNode(); setMenu(null) }}
+            onMoveStart={() => { setIsDragging(true); setMenu(null) }}
             onMoveEnd={() => setIsDragging(false)}
+            onNodeContextMenu={onNodeContextMenu}
          >
             <Panel position='top-center' className='w-full pointer-events-none' ref={refPanel}>
-               {(program) &&
-                   <Header
-                      programName={program.name}
-                      programPlan={program.plan}
-                      hidden={isDragging}
-                      onResetPositions={() => {
-                         calculatePositionY()
-                         calculatePositionX()
-                         resetSelection()
-                         fitViewport()
-                      }}
-                      onFitView={() => {
-                         resetSelection()
-                         fitViewport()
-                      }}
-                   />
+               {(store.program && !isDragging) &&
+                  <Controls
+                     onResetPositions={() => {
+                        setMenu(null)
+                        nodeAction.fitNodes()
+                        nodeAction.unselectNode()
+                        layout.fitViewport()
+                     }}
+                     onAjustView={() => {
+                        setMenu(null)
+                        nodeAction.fitNodes()
+                        layout.fitViewport()
+                     }}
+                  />
                }
             </Panel>
 
             <Background className='opacity-30' />
+
+            {(menu) && <ContextMenu {...menu} />}
          </ReactFlow>
       </main>
    )
