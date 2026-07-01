@@ -135,9 +135,13 @@ export default class AcademicProgram {
          p.modules.forEach(m => {
             modules.push(new AcademicModule(m.id, m.name, m.status, m.requirements, m.year))
          })
+
          periods.push(new AcademicPeriod(p.year, modules))
       })
 
-      return new AcademicProgram(Program.plan, Program.name, periods)
+      const academicProgram = new AcademicProgram(Program.plan, Program.name, periods)
+      academicProgram.periods.forEach(p => p.modules.forEach(m => m.canEnroll = academicProgram.canEnroll(m)))
+
+      return academicProgram
    }
 }

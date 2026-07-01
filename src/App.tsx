@@ -73,7 +73,6 @@ function App() {
 
             p.modules.forEach((mod) => {
                const requirements = [...mod.requirements.passed, ...mod.requirements.taken]
-               const hasRequirements = requirements.length > 0
 
                newNodes.push({
                   id: `${mod.id}`,
@@ -85,7 +84,7 @@ function App() {
                      year: mod.year,
                      type: 'module',
                      requirements: mod.requirements,
-                     canEnroll: !hasRequirements,
+                     canEnroll: mod.canEnroll,
                      onNodeClick: () => { nodeAction.selectNode(mod.id); setMenu(null) },
                      onNodeDoubleClick: () => { nodeAction.switchNodeStatus(mod.id); setMenu(null) }
                   },
