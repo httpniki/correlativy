@@ -54,7 +54,7 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
          ref={btnRef}
          onContextMenu={event => event.preventDefault()}
          onDoubleClick={handleDoubleClick}
-         className={'active:animate-scale-in transition-colors cursor-pointer py-2 px-4 rounded-md z-20 text-white' +
+         className={'active:animate-scale-in transition-colors min-w-30 cursor-pointer py-2 px-4 rounded-md z-20 text-white' +
             (data.status === 'Pendiente' && !data.canEnroll ? ' bg-node text-white hover:bg-node-hover' : '') +
             (data.status === 'Pendiente' && data.canEnroll ? ' bg-node outline outline-white hover:bg-node-hover' : '') +
             (data.status === 'Regular' ? ' bg-taken hover:bg-taken-hover' : '') +
