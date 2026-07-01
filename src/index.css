@@ -1,3 +1,8 @@
+@import "@fontsource/geist-sans/400.css";
+@import "@fontsource/geist-sans/500.css";
+@import "@fontsource/geist-sans/700.css";
+@import "@fontsource/geist-sans/900.css";
+
 @import "tailwindcss";
 
 @theme {
@@ -10,6 +15,7 @@
    --color-passed-hover: #008055;
 
    --animate-scale-in: scale-in 0.3s forwards;
+   --font-sans: "Geist Sans", sans-serif, system-ui;
 
    @keyframes scale-in {
       from {
@@ -38,8 +44,13 @@
    box-shadow: 0 0 10px var(--color-shadow-passed);
 }
 
+@layer base {
+   body {
+      @apply font-sans;
+   }
+}
+
 :root {
-   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
    line-height: 1.5;
    font-weight: 400;
 
