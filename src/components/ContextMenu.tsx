@@ -54,7 +54,7 @@ export default function ContextMenu(props: IMenu) {
    return (
       <div
          style={{ top: props.top, left: props.left }}
-         className='w-80 text-white absolute text-sm bg-node bg-opacity-50 p-2 z-1000 shadow-[0_0_10px_#ffffff10] rounded-sm'
+         className='animation-openMenu w-80 text-white absolute text-sm bg-main bg-opacity-50 p-2 z-1000 shadow-[0_0_10px_#ffffff10] rounded-sm'
       >
          <div className='flex flex-col items-center border p-2 border-white'>
             <header className='w-full flex flex-col gap-1 items-center'>
@@ -97,7 +97,7 @@ export default function ContextMenu(props: IMenu) {
             <button
                disabled={!node?.canEnroll}
                onClick={onChangeStatus}
-               className='w-full border p-2 bg-node mt-2 text-center text-sm disabled:opacity-20 cursor-pointer disabled:cursor-default hover:opacity-75 disabled:hover:opacity-20'
+               className='w-full border p-2 bg-main mt-2 text-center text-sm disabled:opacity-20 cursor-pointer disabled:cursor-default enabled:hover:bg-node disabled:hover:opacity-20'
             >
                {node?.status === 'Pendiente' ? 'Regularizar' : ''}
                {node?.status === 'Regular' ? 'Promover' : ''}

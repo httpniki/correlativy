@@ -1,47 +1,98 @@
 @import "tailwindcss";
 
 @theme {
-  /* --color-main: #101013; */
    --color-main: #0a0a0a;
-  --color-node: #161616;
-  --color-node-selected: #b08bec;
-  --color-taken: #F97316;
-  --color-taken-selected: #d76548;
-  --color-passed: #10B981;
-  --color-passed-selected: #439d50;
-  --color-shadow-white: #ffffff80;
-  --color-shadow-white-dim: #ffffff50;
-  --color-shadow-taken: #ac3e2190;
-  --color-shadow-passed: #006e2290;
+   --color-node: #151515;
+   --color-node-hover: #111111;
+   --color-taken: #e04010;
+   --color-taken-hover: #d04000;
+   --color-passed: #009065;
+   --color-passed-hover: #008055;
+
+   --animate-scale-in: scale-in 0.3s forwards;
+
+   @keyframes scale-in {
+      from {
+         transform: scale(1);
+      }
+
+      to {
+         transform: scale(0.97);
+      }
+   }
 }
 
 @utility text-shadow-white {
-  text-shadow: 0 0 10px var(--color-shadow-white);
+   text-shadow: 0 0 10px var(--color-shadow-white);
 }
 
 @utility text-shadow-white-dim {
-  text-shadow: 0 0 10px var(--color-shadow-white-dim);
+   text-shadow: 0 0 10px var(--color-shadow-white-dim);
 }
 
 @utility shadow-taken {
-  box-shadow: 0 0 10px var(--color-shadow-taken);
+   box-shadow: 0 0 10px var(--color-shadow-taken);
 }
 
 @utility shadow-passed {
-  box-shadow: 0 0 10px var(--color-shadow-passed);
+   box-shadow: 0 0 10px var(--color-shadow-passed);
 }
 
 :root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+   line-height: 1.5;
+   font-weight: 400;
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+   font-synthesis: none;
+   text-rendering: optimizeLegibility;
+   -webkit-font-smoothing: antialiased;
+   -moz-osx-font-smoothing: grayscale;
 }
 
 .react-flow__attribution {
    display: none;
+}
+
+.animation-error {
+   animation-name: error;
+   animation-duration: 0.15s;
+   animation-timing-function: linear;
+   animation-iteration-count: 3;
+}
+
+@keyframes error {
+   0% {
+      transform: translateX(5px);
+   }
+
+   25% {
+      transform: translateX(0px);
+   }
+
+   50% {
+      transform: translateX(-5);
+   }
+
+   75%,
+   100% {
+      transform: translateX(0);
+   }
+}
+
+.animation-openMenu {
+   animation-name: openMenu;
+   animation-duration: 0.3s;
+   animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes openMenu {
+   0% {
+      opacity: 0;
+      transform: translateY(10px);
+   }
+
+   100% {
+      opacity: 1;
+      transform: translateY(0);
+   }
 }

@@ -16,6 +16,7 @@ export type IModuleNode = Node<ModuleNodeData, 'module'>
 
 export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
    const clickTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+   const btnRef = useRef<HTMLButtonElement>(null)
 
    function handleClick() {
       if (clickTimeoutRef.current) {
@@ -26,10 +27,19 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
       clickTimeoutRef.current = setTimeout(() => {
          data.onNodeClick(id)
          clickTimeoutRef.current = null
-      }, 200)
+      }, 210)
    }
 
    function handleDoubleClick() {
+      if (btnRef.current) {
+         btnRef.current?.classList.remove('animation-error')
+
+         if (!data.canEnroll) {
+            void btnRef.current?.offsetWidth
+            btnRef.current?.classList.add('animation-error')
+         }
+      }
+
       if (clickTimeoutRef.current) {
          clearTimeout(clickTimeoutRef.current)
          clickTimeoutRef.current = null
@@ -38,20 +48,17 @@ export default function ModuleNode({ id, data }: NodeProps<IModuleNode>) {
       data.onNodeDoubleClick(id)
    }
 
-   function handleContextMenu(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) {
-      e.preventDefault()
-   }
-
    return (
       <button
          onClick={handleClick}
-         onContextMenu={handleContextMenu}
+         ref={btnRef}
+         onContextMenu={event => event.preventDefault()}
          onDoubleClick={handleDoubleClick}
-         className={'cursor-pointer py-2 px-4 rounded-md z-20 text-white' +
-            (data.status === 'Pendiente' && !data.canEnroll ? ' bg-node text-white' : '') +
-            (data.status === 'Pendiente' && data.canEnroll ? ' bg-node outline outline-white' : '') +
-            (data.status === 'Regular' ? ' bg-taken box-shadow-taken' : '') +
-            (data.status === 'Aprobado' ? ' bg-passed box-shadow-passed' : '')
+         className={'active:animate-scale-in transition-colors cursor-pointer py-2 px-4 rounded-md z-20 text-white' +
+            (data.status === 'Pendiente' && !data.canEnroll ? ' bg-node text-white hover:bg-node-hover' : '') +
+            (data.status === 'Pendiente' && data.canEnroll ? ' bg-node outline outline-white hover:bg-node-hover' : '') +
+            (data.status === 'Regular' ? ' bg-taken hover:bg-taken-hover' : '') +
+            (data.status === 'Aprobado' ? ' bg-passed hover:bg-passed-hover' : '')
          }
       >
          <Handle
